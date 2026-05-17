@@ -58,18 +58,20 @@ function install(tui: TUI): void {
       return originalRender?.(width) ?? [];
     }
 
-    const header = render(children[0], width);
-    const chat = render(children[1], width);
+    const scrollback = [
+      ...render(children[0], width), // startup header scrolls away with chat history
+      ...render(children[1], width),
+    ];
     const bottom = children.slice(2).flatMap((child) => render(child, width));
 
-    const chatHeight = Math.max(0, patchedTui.terminal.rows - header.length - bottom.length);
-    maxScrollOffset = Math.max(0, chat.length - chatHeight);
+    const scrollbackHeight = Math.max(0, patchedTui.terminal.rows - bottom.length);
+    maxScrollOffset = Math.max(0, scrollback.length - scrollbackHeight);
     scrollOffset = Math.max(0, Math.min(maxScrollOffset, scrollOffset));
 
-    const start = Math.max(0, chat.length - chatHeight - scrollOffset);
-    const visibleChat = chatHeight > 0 ? chat.slice(start, start + chatHeight) : [];
+    const start = Math.max(0, scrollback.length - scrollbackHeight - scrollOffset);
+    const visibleScrollback = scrollbackHeight > 0 ? scrollback.slice(start, start + scrollbackHeight) : [];
 
-    return [...header, ...visibleChat, ...bottom];
+    return [...visibleScrollback, ...bottom];
   };
 
   patchedTui.requestRender(true);
