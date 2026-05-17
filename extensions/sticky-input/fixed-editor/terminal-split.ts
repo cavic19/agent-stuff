@@ -596,6 +596,14 @@ export class TerminalSplitCompositor {
   private handleInput(data: string): { consume?: boolean; data?: string } | undefined {
     if (this.disposed || this.hasVisibleOverlay()) return undefined;
 
+    if (matchesKey(data, "super+c") || data === "\x03") {
+      const selectedText = this.getSelectedText();
+      if (selectedText) {
+        this.onCopySelection?.(selectedText);
+        return { consume: true };
+      }
+    }
+
     const mousePackets = this.mouseScroll ? parseSgrMousePackets(data) : null;
     if (mousePackets) {
       for (const packet of mousePackets) {

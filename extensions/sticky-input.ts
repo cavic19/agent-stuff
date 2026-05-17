@@ -43,6 +43,13 @@ function hasRender(el: unknown): el is { render(width: number): string[] } {
   return el != null && typeof (el as any).render === "function";
 }
 
+function copySelectionToClipboard(text: string): void {
+  if (!text) return;
+  void copyToClipboard(text).catch((error) => {
+    console.error("[sticky-input] Failed to copy selection:", error);
+  });
+}
+
 /**
  * Search tui.children for the container that holds the given renderable as a
  * direct child.  Returns -1 if not found.
@@ -130,7 +137,7 @@ export default function piSticky(pi: ExtensionAPI) {
         tui,
         terminal: tui.terminal,
         mouseScroll: true,
-        onCopySelection: (text) => copyToClipboard(text),
+        onCopySelection: (text) => copySelectionToClipboard(text),
         getShowHardwareCursor: () =>
           typeof tui.getShowHardwareCursor === "function" &&
           tui.getShowHardwareCursor(),
