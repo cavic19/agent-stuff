@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+PY="$SKILL_DIR/.venv/bin/python"
+
+if [[ ! -x "$PY" ]]; then
+  echo "Skill venv not found. Run setup:" >&2
+  echo "  cd $SKILL_DIR && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt" >&2
+  exit 2
+fi
+
+exec "$PY" "$SCRIPT_DIR/youtube_transcribe.py" "$@"
